@@ -52,8 +52,8 @@ android.ndk = 25b
 # (bool) Automatically accept SDK license agreements
 android.accept_sdk_license = True
 
-# (str) The Android arch to build for
-android.archs = arm64-v8a, armeabi-v7a
+# (str) The Android arch to build for (Sadece arm64-v8a derlenerek bellek hatası engellendi)
+android.archs = arm64-v8a
 
 # (bool) Enable Android logcat
 android.logcat_filters = *:S python:D

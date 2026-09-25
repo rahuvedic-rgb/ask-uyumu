@@ -16,7 +16,8 @@ source.dir = .
 source.include_exts = py,png,jpg,jpeg,json,kv
 
 # (list) Application requirements
-requirements = python3,kivy
+# Python ve Kivy sürümleri uyumluluk için sabitlendi
+requirements = python3==3.11.8,kivy==2.3.0
 
 # (str) Application versioning
 version = 1.0

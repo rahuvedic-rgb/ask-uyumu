@@ -16,8 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,jpeg,json,kv
 
 # (list) Application requirements
-# Python ve Kivy sürümleri uyumluluk için sabitlendi
-requirements = python3==3.11.8,kivy==2.3.0
+requirements = python3,kivy
 
 # (str) Application versioning
 version = 1.0
@@ -41,10 +40,10 @@ icon.filename = %(source.dir)s/icon.png
 # (bool) Indicate whether the screen should be kept on when the app is open
 android.keep_screen_on = 1
 
-# (int) Target Android API, should be as high as possible.
+# (int) Target Android API
 android.api = 33
 
-# (int) Minimum API your APK will support.
+# (int) Minimum API your APK will support
 android.minapi = 21
 
 # (str) Android NDK version to use

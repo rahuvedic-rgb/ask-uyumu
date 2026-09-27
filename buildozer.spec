@@ -6,41 +6,40 @@ title = Ask Uyumu
 # (str) Package name
 package.name = askuyumu
 
-# (str) Package domain (needed for android/ios packaging)
+# (str) Package domain
 package.domain = org.askuyumu
 
-# (str) Source code where the main.py lives
+# (str) Source code location
 source.dir = .
 
-# (list) Source files to include (let empty to include all the files)
+# (list) Source files to include
 source.include_exts = py,png,jpg,kv,atlas,json
 
 # (str) Application version
 version = 0.1
 
 # (list) Application requirements
-# comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna
+requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna,sqlite3
 
-# (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
+# (str) Supported orientation
 orientation = portrait
 
-# (bool) Indicate if the application should be fullscreen or not
+# (bool) Fullscreen mode
 fullscreen = 0
 
-# (int) Target Android API, should be as high as possible.
+# (int) Target Android API
 android.api = 33
 
-# (int) Minimum API required
+# (int) Minimum API supported
 android.minapi = 21
 
 # (str) Android NDK version to use
 android.ndk = 25b
 
-# (int) Android NDK API to use
+# (int) Android NDK API level
 android.ndk_api = 21
 
-# (list) The Android archs to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
+# (list) Target architecture
 android.archs = arm64-v8a
 
 # (bool) Accept SDK license
@@ -51,8 +50,8 @@ android.skip_update = False
 
 [buildozer]
 
-# (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
+# (int) Log level (0 = error only, 1 = info, 2 = debug)
 log_level = 2
 
-# (int) Display warning if buildozer is run as root (0 = disable, 1 = enable)
+# (int) Display warning if buildozer is run as root
 warn_on_root = 1

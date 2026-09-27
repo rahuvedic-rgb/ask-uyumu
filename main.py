@@ -229,6 +229,7 @@ def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke
     try:
         swe.close()
         swe.set_ephe_path('')
+        # Lahiri Ayanamsa modunu ayarlıyoruz
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
 
         g = int(str(gun).strip())

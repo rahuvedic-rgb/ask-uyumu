@@ -19,8 +19,8 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-# Skyfield ve zaman dilimi hesaplamaları için saf Python paketleri
-requirements = python3,kivy==2.2.1,skyfield,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
+# Skyfield ve bağımlılıkları Android için en kararlı biçimde tanımlandı
+requirements = python3,kivy==2.2.1,skyfield,sgp4,jplephem,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
 orientation = portrait
@@ -43,7 +43,7 @@ android.ndk = 25b
 android.accept_sdk_license = True
 
 # (list) Architectures
-android.archs = arm64-v8a
+android.archs = arm64-v8a, armeabi-v7a
 
 [buildozer]
 log_level = 2

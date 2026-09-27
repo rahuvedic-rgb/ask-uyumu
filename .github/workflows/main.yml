@@ -24,12 +24,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Fix Apt Dependencies and Install System Packages
+      - name: Install System Dependencies
         run: |
-          sudo apt-get clean
-          sudo apt-get update --fix-missing
-          sudo apt-get install -f
-          sudo apt-get remove -y libunwind-dev || true
+          sudo apt-get update
           sudo apt-get install -y \
             build-essential \
             git \
@@ -53,16 +50,15 @@ jobs:
       - name: Install Buildozer & Cython
         run: |
           python -m pip install --upgrade pip setuptools
-          pip install "cython<3.0.0"
+          pip install "cython==0.29.36"
           pip install buildozer
 
-      - name: Accept Android SDK Licenses
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
       - name: Build APK with Buildozer
+        env:
+          # GitHub Runner'ın otomatik atadığı NDK 27 değişkenlerini Buildozer'ın NDK 25b diziniyle eziyoruz
+          ANDROID_NDK_ROOT: /home/runner/.buildozer/android/platform/android-ndk-r25b
+          ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r25b
+          ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
         run: |
           buildozer -v android debug
 

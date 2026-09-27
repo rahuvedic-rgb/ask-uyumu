@@ -1,37 +1,32 @@
 [app]
 
-# (str) Title of your application
+# Uygulama Bilgileri
 title = Ask Uyumu
-
-# (str) Package name
 package.name = askuyumu
-
-# (str) Package domain (needed for android/ios packaging)
 package.domain = org.askuyumu
-
-# (str) Source code where the main.py lives
 source.dir = .
+source.include_exts = py,png,jpg,kv,atlas,json
 
-# (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas
+# Versiyon
+version = 0.1
 
-# (list) Application requirements
+# Bağımlılıklar (Gstreamer çakışmalarını önlemek için sade tutulmuştur)
 requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna
 
-# (int) Target Android API, should be as high as possible.
+# Oryantasyon
+orientation = portrait
+
+# Android Ayarları
+osx.kivy_version = 2.2.1
+fullscreen = 0
 android.api = 33
-
-# (int) Minimum API required
 android.minapi = 21
-
-# (str) Android NDK version to use (Sadece 25b girilmelidir)
 android.ndk = 25b
-
-# (int) Android NDK API to use
 android.ndk_api = 21
-
-# (list) The Android archs to build for
 android.archs = arm64-v8a
-
-# (bool) Accept SDK license
 android.accept_sdk_license = True
+android.skip_update = False
+
+[buildozer]
+log_level = 2
+warn_on_root = 1

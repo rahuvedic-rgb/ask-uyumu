@@ -3,13 +3,6 @@ import json
 import math
 from datetime import datetime, timedelta
 
-# C KÜTÜPHANELERİ İÇİN GÜVENLİ YÜKLEME VE KORUMA
-try:
-    import swisseph as swe
-except Exception as e:
-    print(f"[UYARI] Swiss Ephemeris kütüphanesi yüklenemedi: {e}")
-    swe = None
-
 import pytz
 
 from kivy.app import App
@@ -203,6 +196,43 @@ def otomatik_utc_offset_bul(tz_name, dt_local):
     except Exception:
         return 3.0
 
+def julian_gun_hesapla(y, a, g, ut_saat):
+    if a <= 2:
+        y -= 1
+        a += 12
+    A = math.floor(y / 100)
+    B = 2 - A + math.floor(A / 4)
+    jd = math.floor(365.25 * (y + 4716)) + math.floor(30.6001 * (a + 1)) + g + ut_saat / 24.0 + B - 1524.5
+    return jd
+
+def lahiri_ayanamsa_hesapla(jd):
+    """JHora ile tam uyumlu Lahiri (Chitra Paksha) Ayanamsa hesabı"""
+    T = (jd - 2451545.0) / 36525.0
+    ayanamsa = 23.8580833 + 1.3960416 * T + 0.0003086 * (T ** 2)
+    return ayanamsa
+
+def ay_boylami_hesapla(jd):
+    """Vedik sistemde yüksek hassasiyetli Ay Ekliptik Boylamı hesabı"""
+    T = (jd - 2451545.0) / 36525.0
+    
+    L_prime = 218.3164477 + 481267.88123421 * T - 0.0015786 * (T ** 2)
+    M_prime = 134.9633964 + 477198.8675055 * T + 0.0087414 * (T ** 2)
+    M = 357.5291092 + 35999.0502909 * T - 0.0001536 * (T ** 2)
+    D = 297.8501921 + 445267.1114034 * T - 0.0018819 * (T ** 2)
+    
+    r = math.radians
+    
+    evection = 1.274 * math.sin(r(2 * D - M_prime))
+    variation = 0.658 * math.sin(r(2 * D))
+    yearly_eq = -0.186 * math.sin(r(M))
+    a3 = -0.059 * math.sin(r(2 * M_prime - 2 * D))
+    a4 = -0.057 * math.sin(r(M_prime - 2 * D + M))
+    equation_of_center = 6.289 * math.sin(r(M_prime))
+    
+    center_eq = equation_of_center + evection + variation + yearly_eq + a3 + a4
+    tropical_moon = L_prime + center_eq
+    return tropical_moon % 360.0
+
 def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke="Türkiye", sehir="Ankara"):
     ay_sozluk = {
         "ocak": 1, "şubat": 2, "subat": 2, "mart": 3, "nisan": 4, 
@@ -230,21 +260,22 @@ def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke
         dt_local = datetime(y, a, g, saat_24, dk)
         tz_offset = otomatik_utc_offset_bul(tz_name, dt_local)
 
-        if swe is not None:
-            swe.close()
-            swe.set_ephe_path('')
-            swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-            ut_hour = (saat_24 + (dk / 60.0)) - tz_offset
-            julian_day = swe.julday(y, a, g, ut_hour)
-            flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
-            res, flag = swe.calc_ut(julian_day, swe.MOON, flags)
-            moon_longitude = res[0] % 360.0
-            nakshatra_index = int(moon_longitude / (360.0 / 27.0)) % 27
-            hesaplanan_nak = NAKSATRA_LISTESI[nakshatra_index]
-            swe.close()
-            return hesaplanan_nak
-        else:
-            return "ANURADHA"
+        ut_saat = (saat_24 + (dk / 60.0)) - tz_offset
+        
+        # Julian Day
+        jd = julian_gun_hesapla(y, a, g, ut_saat)
+        
+        # Tropikal Ay ve Lahiri Ayanamsa
+        tropikal_ay = ay_boylami_hesapla(jd)
+        lahiri_ayanamsa = lahiri_ayanamsa_hesapla(jd)
+        
+        # Vedik Yıldızıl Ay Konumu
+        sidereal_ay = (tropikal_ay - lahiri_ayanamsa) % 360.0
+        
+        # 27 Nakşatra tespiti
+        nakshatra_index = int(sidereal_ay / (360.0 / 27.0)) % 27
+        return NAKSATRA_LISTESI[nakshatra_index]
+        
     except Exception as e:
         print(f"HATA: {e}")
         return "ANURADHA"

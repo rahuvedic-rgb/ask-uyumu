@@ -1,15 +1,15 @@
 [app]
 
-# (str) Title of your application
+# (str) Application title
 title = AskUyumu
 
 # (str) Package name
 package.name = askuyumu
 
-# (str) Package domain (needed for android/ios packaging)
+# (str) Package domain
 package.domain = com.rahuvedic.askuyumu
 
-# (str) Source code where the main.py live
+# (str) Source code directory
 source.dir = .
 
 # (list) Source files to include
@@ -19,7 +19,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-# Python 3, Kivy ve Skyfield için gerekli saf Python / p4a paketleri
+# Skyfield, pytz ve timezonefinder gereksinimleri tanımlandı
 requirements = python3,kivy==2.2.1,skyfield,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
@@ -28,13 +28,13 @@ orientation = portrait
 # (bool) Fullscreen
 fullscreen = 0
 
-# (str) Icon
+# (str) Application Icon
 icon.filename = %(source.dir)s/1uyum (1).jpg
 
 # (list) Permissions
 internet = INTERNET, ACCESS_NETWORK_STATE
 
-# (int) Target & Min API
+# (int) Minimum and Target Android API
 android.minapi = 21
 android.api = 33
 android.ndk = 25b
@@ -46,5 +46,9 @@ android.accept_sdk_license = True
 android.archs = arm64-v8a
 
 [buildozer]
+
+# (int) Log level
 log_level = 2
+
+# (int) Display warning if run as root
 warn_on_root = 1

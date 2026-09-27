@@ -1,67 +1,57 @@
 [app]
 
-# (str) Title of your application
-title = Ask Uyumu
+# (str) Application title
+title = Ask Uyumu Analizi
 
 # (str) Package name
 package.name = askuyumu
 
-# (str) Package domain (needed for android/ios packaging)
-package.domain = org.rahuvedic
+# (str) Package domain
+package.domain = com.rahuvedic
 
-# (str) Source code where the main.py live
+# (str) Source code where the main.py lives
 source.dir = .
 
-# (list) Source files to include (include python, image, json files)
-source.include_exts = py,png,jpg,jpeg,json,kv
-
-# (list) Application requirements
-requirements = python3,kivy
+# (list) Source files to include
+source.include_exts = py,png,jpg,kv,atlas,json
 
 # (str) Application versioning
-version = 1.0
+version = 1.0.0
 
-# (list) Permissions
-android.permissions = INTERNET
+# (list) Application requirements
+requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna
 
-# (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
+# (str) Supported orientations
 orientation = portrait
 
-# (bool) Indicate if the application should be fullscreen or not
+# (bool) Fullscreen
 fullscreen = 0
 
-# (string) Preserved icon filename
-icon.filename = %(source.dir)s/icon.png
-
-#
-# Android specific
-#
-
-# (bool) Indicate whether the screen should be kept on when the app is open
-android.keep_screen_on = 1
+# (list) Permissions
+android.permissions = INTERNET, ACCESS_NETWORK_STATE
 
 # (int) Target Android API
 android.api = 33
 
-# (int) Minimum API your APK will support
+# (int) Minimum API required
 android.minapi = 21
 
-# (str) Android NDK version to use
+# (str) Android NDK version
 android.ndk = 25b
 
-# (bool) Automatically accept SDK license agreements
-android.accept_sdk_license = True
+# (bool) Skip updating Android SDK
+android.skip_update = False
 
-# (str) The Android arch to build for (Sadece arm64-v8a derlenerek bellek hatası engellendi)
+# (bool) Automatically accept SDK licenses
+android.accept_sdk_licenses = True
+
+# (list) Modern 64-bit mimari
 android.archs = arm64-v8a
-
-# (bool) Enable Android logcat
-android.logcat_filters = *:S python:D
 
 [buildozer]
 
-# (int) Log level (0 = error only, 1 = info, 2 = debug)
+# (int) Log level
 log_level = 2
 
-# (int) Display warning if buildozer is run as root
+# (int) Display warning if run as root
 warn_on_root = 1

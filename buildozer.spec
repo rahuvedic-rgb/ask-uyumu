@@ -18,8 +18,8 @@ source.include_exts = py,png,jpg,kv,atlas,json
 # (str) Application version
 version = 0.1
 
-# (list) Application requirements
-requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna,sqlite3
+# (list) Application requirements (pyswisseph eklenmiştir)
+requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna,pyswisseph,timezonefinder
 
 # (str) Supported orientation
 orientation = portrait

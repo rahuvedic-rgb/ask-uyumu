@@ -3,7 +3,7 @@ import json
 import math
 from datetime import datetime, timedelta
 
-# C KÜTÜPHANELERİ İÇİN GÜVENLİ YÜKLEME VE KORUMA (CRASH PREVENTION)
+# C KÜTÜPHANELERİ İÇİN GÜVENLİ YÜKLEME VE KORUMA
 try:
     import swisseph as swe
 except Exception as e:
@@ -11,13 +11,6 @@ except Exception as e:
     swe = None
 
 import pytz
-
-try:
-    from timezonefinder import TimezoneFinder
-    tf = TimezoneFinder()
-except Exception as e:
-    print(f"[UYARI] TimezoneFinder yüklenemedi: {e}")
-    tf = None
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
@@ -59,7 +52,7 @@ REHBER_VE_YASAL_UYARI_METNI = """==================================
 3. BAKIŞ AÇISI UYARISI ("SEN" vs "O")
 ----------------------------------
 * "SEN" bölümüne kendi bilgilerinizi yazdığınızda analiz SİZİN BAKIŞ AÇINIZA göre yapılır.
-* "SEN" bölümüne partnerinizin bilgilerini yazdığınızda analiz ONUN BAKIŞ AÇISINA göre yapılır.
+* "SEN" bölümüne partnerinizin bilgilerini yazdığınızda analiz ONUN BAKIŞ AÇINIZA göre yapılır.
 
 4. UYUM ORANI SKALASI (%0 - %91)
 ----------------------------------
@@ -102,21 +95,21 @@ def rehber_popup_goster(instance=None):
 
 LOKASYON_VERISI = {
     "Türkiye": {
-        "Ankara": {"lat": 39.93, "lon": 32.85},
-        "İstanbul": {"lat": 41.00, "lon": 28.97},
-        "İzmir": {"lat": 38.42, "lon": 27.14},
-        "Bursa": {"lat": 40.18, "lon": 29.06},
-        "Antalya": {"lat": 36.89, "lon": 30.70},
-        "Adana": {"lat": 37.00, "lon": 35.32},
-        "Gaziantep": {"lat": 37.06, "lon": 37.38},
-        "Konya": {"lat": 37.87, "lon": 32.48},
-        "Trabzon": {"lat": 41.00, "lon": 39.71},
-        "Şanlıurfa": {"lat": 37.16, "lon": 38.79},
-        "Hatay": {"lat": 36.20, "lon": 36.16}
+        "Ankara": {"lat": 39.93, "lon": 32.85, "tz": "Europe/Istanbul"},
+        "İstanbul": {"lat": 41.00, "lon": 28.97, "tz": "Europe/Istanbul"},
+        "İzmir": {"lat": 38.42, "lon": 27.14, "tz": "Europe/Istanbul"},
+        "Bursa": {"lat": 40.18, "lon": 29.06, "tz": "Europe/Istanbul"},
+        "Antalya": {"lat": 36.89, "lon": 30.70, "tz": "Europe/Istanbul"},
+        "Adana": {"lat": 37.00, "lon": 35.32, "tz": "Europe/Istanbul"},
+        "Gaziantep": {"lat": 37.06, "lon": 37.38, "tz": "Europe/Istanbul"},
+        "Konya": {"lat": 37.87, "lon": 32.48, "tz": "Europe/Istanbul"},
+        "Trabzon": {"lat": 41.00, "lon": 39.71, "tz": "Europe/Istanbul"},
+        "Şanlıurfa": {"lat": 37.16, "lon": 38.79, "tz": "Europe/Istanbul"},
+        "Hatay": {"lat": 36.20, "lon": 36.16, "tz": "Europe/Istanbul"}
     },
     "İspanya": {
-        "Madrid": {"lat": 40.41, "lon": -3.70},
-        "Barselona": {"lat": 41.38, "lon": 2.17}
+        "Madrid": {"lat": 40.41, "lon": -3.70, "tz": "Europe/Madrid"},
+        "Barselona": {"lat": 41.38, "lon": 2.17, "tz": "Europe/Madrid"}
     }
 }
 
@@ -202,13 +195,8 @@ def metin_sadeleştir(s):
         s = s.replace(k, v)
     return "".join(c for c in s if c.isalpha())
 
-def otomatik_utc_offset_bul(lat, lon, dt_local):
-    if tf is None:
-        return 3.0
+def otomatik_utc_offset_bul(tz_name, dt_local):
     try:
-        tz_name = tf.timezone_at(lat=lat, lng=lon)
-        if not tz_name:
-            return 3.0
         local_tz = pytz.timezone(tz_name)
         localized_dt = local_tz.localize(dt_local, is_dst=None)
         return localized_dt.utcoffset().total_seconds() / 3600.0
@@ -221,17 +209,8 @@ def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke
         "mayıs": 5, "mayis": 5, "haziran": 6, "temmuz": 7, "ağustos": 8, "agustos": 8,
         "eylül": 9, "eylul": 9, "ekim": 10, "kasım": 11, "kasim": 11, "aralık": 12, "aralik": 12
     }
-    
-    if swe is None:
-        print("[UYARI] Swiss Ephemeris kütüphanesi aktif değil.")
-        return "ANURADHA"
 
     try:
-        swe.close()
-        swe.set_ephe_path('')
-        # Lahiri Ayanamsa modunu ayarlıyoruz
-        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-
         g = int(str(gun).strip())
         a = ay_sozluk.get(str(ay_str).strip().lower(), 1)
         y = int(str(yil_str).strip())
@@ -245,25 +224,27 @@ def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke
         else: 
             saat_24 = saat_12
 
-        lokasyon = LOKASYON_VERISI.get(ulke, {}).get(sehir, {"lat": 39.93, "lon": 32.85})
-        lat = lokasyon.get("lat", 39.93)
-        lon = lokasyon.get("lon", 32.85)
+        lokasyon = LOKASYON_VERISI.get(ulke, {}).get(sehir, {"lat": 39.93, "lon": 32.85, "tz": "Europe/Istanbul"})
+        tz_name = lokasyon.get("tz", "Europe/Istanbul")
 
         dt_local = datetime(y, a, g, saat_24, dk)
-        tz_offset = otomatik_utc_offset_bul(lat, lon, dt_local)
+        tz_offset = otomatik_utc_offset_bul(tz_name, dt_local)
 
-        ut_hour = (saat_24 + (dk / 60.0)) - tz_offset
-        julian_day = swe.julday(y, a, g, ut_hour)
-
-        flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
-        res, flag = swe.calc_ut(julian_day, swe.MOON, flags)
-        moon_longitude = res[0] % 360.0
-
-        nakshatra_index = int(moon_longitude / (360.0 / 27.0)) % 27
-        hesaplanan_nak = NAKSATRA_LISTESI[nakshatra_index]
-
-        swe.close()
-        return hesaplanan_nak
+        if swe is not None:
+            swe.close()
+            swe.set_ephe_path('')
+            swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+            ut_hour = (saat_24 + (dk / 60.0)) - tz_offset
+            julian_day = swe.julday(y, a, g, ut_hour)
+            flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+            res, flag = swe.calc_ut(julian_day, swe.MOON, flags)
+            moon_longitude = res[0] % 360.0
+            nakshatra_index = int(moon_longitude / (360.0 / 27.0)) % 27
+            hesaplanan_nak = NAKSATRA_LISTESI[nakshatra_index]
+            swe.close()
+            return hesaplanan_nak
+        else:
+            return "ANURADHA"
     except Exception as e:
         print(f"HATA: {e}")
         return "ANURADHA"

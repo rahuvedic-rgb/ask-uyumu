@@ -12,47 +12,39 @@ package.domain = com.rahuvedic.askuyumu
 # (str) Source code where the main.py live
 source.dir = .
 
-# (list) Source files to include (let empty to include all the files)
+# (list) Source files to include
 source.include_exts = py,png,jpg,kv,atlas,json,bsp
 
 # (str) Application versioning
 version = 1.0.0
 
 # (list) Application requirements
-# Skyfield, pytz, timezonefinder ve gerekli C bağımlılıkları eklenmiştir
-requirements = python3,kivy==2.2.1,skyfield,pytz,timezonefinder,sgp4,jplephem,certifi,urllib3,requests,numpy,h3,cffi
+# Python 3, Kivy ve Skyfield için gerekli saf Python / p4a paketleri
+requirements = python3,kivy==2.2.1,skyfield,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
 
-# (str) Supported orientation (landscape, sensorLandscape, portrait or all)
+# (str) Supported orientation
 orientation = portrait
 
-# (bool) Indicate if the application should be fullscreen or not
+# (bool) Fullscreen
 fullscreen = 0
 
-# (str) Icon of the application
+# (str) Icon
 icon.filename = %(source.dir)s/1uyum (1).jpg
 
 # (list) Permissions
-internet = INTERNET, ACCESS_NETWORK_STATE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION
+internet = INTERNET, ACCESS_NETWORK_STATE
 
-# (int) Minimum API required (Android 7.0 / Nougat)
-android.minapi = 24
-
-# (int) Target Android API (Android 13 / 14 standartı)
+# (int) Target & Min API
+android.minapi = 21
 android.api = 33
-
-# (str) Android NDK version
-android.ndk = 25.2.9519653
+android.ndk = 25b
 
 # (bool) Accept SDK license automatically
 android.accept_sdk_license = True
 
-# (list) List of Android architectures to build for
-android.archs = arm64-v8a, armeabi-v7a
+# (list) Architectures
+android.archs = arm64-v8a
 
 [buildozer]
-
-# (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
 log_level = 2
-
-# (int) Display warning if buildozer is run as root (0 = disable, 1 = enable)
 warn_on_root = 1

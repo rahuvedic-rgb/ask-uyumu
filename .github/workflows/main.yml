@@ -55,7 +55,6 @@ jobs:
 
       - name: Build APK with Buildozer
         env:
-          # GitHub Runner'ın otomatik atadığı NDK 27 değişkenlerini Buildozer'ın NDK 25b diziniyle eziyoruz
           ANDROID_NDK_ROOT: /home/runner/.buildozer/android/platform/android-ndk-r25b
           ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r25b
           ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b

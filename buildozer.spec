@@ -19,7 +19,8 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-requirements = python3,kivy==2.2.1,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
+# Sadece Android ile %100 uyumlu saf paketler
+requirements = python3,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
 orientation = portrait
@@ -37,7 +38,7 @@ internet = INTERNET, ACCESS_NETWORK_STATE
 android.minapi = 21
 android.api = 33
 
-# (str) Android NDK version (Kivy uyumluluğu için r25b şarttır)
+# (str) Android NDK version
 android.ndk = 25b
 
 # (bool) Accept SDK license automatically

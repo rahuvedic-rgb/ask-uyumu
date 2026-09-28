@@ -26,16 +26,14 @@ jobs:
           autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
           libncursesw5-dev libtinfo5 cmake
 
-    - name: Buildozer ve Cython Yükle
+    - name: Derleme Araçlarını Hazırla
       run: |
         pip install --upgrade pip
         pip install "cython<3.0.0" cffi
-        pip install git+https://github.com/kivy/buildozer.git
-        pip install git+https://github.com/kivy/python-for-android.git
+        pip install buildozer
 
-    - name: Hatalı Önbelleği Temizle ve APK Derle
+    - name: APK Dosyasını Derle
       run: |
-        buildozer android clean || true
         buildozer -v android debug
 
     - name: Derlenen APK Dosyasını Yükle

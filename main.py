@@ -6,7 +6,13 @@ from datetime import datetime, timedelta
 # Skyfield ve Lisanssız Matematiksel Kütüphaneler
 from skyfield.api import load, Topos
 import pytz
-from timezonefinder import TimezoneFinder
+
+# TimezoneFinder Güvenli Yükleme
+try:
+    from timezonefinder import TimezoneFinder
+    tf = TimezoneFinder()
+except Exception:
+    tf = None
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
@@ -30,9 +36,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(BASE_DIR, "naksatra_cache.json")
 GITHUB_JSON_URL = "https://raw.githubusercontent.com/rahuvedic-rgb/ask-uyumu/main/sukur_naksatra_uyum_data_3.json"
 
-tf = TimezoneFinder()
-
-# Skyfield Ephemeris Verisinin Yerel Dizin Garantili Yüklenmesi
+# Skyfield Ephemeris Verisinin Yüklenmesi
 ts = load.timescale()
 eph = None
 try:
@@ -310,14 +314,16 @@ def metin_sadeleştir(s):
         s = s.replace(k, v)
     return "".join(c for c in s if c.isalpha())
 
+# GÜVENLİ VE HATA VERMEYEN ZAMAN DİLİMİ MANTIGI
 def otomatik_utc_offset_bul(lat, lon, dt_local):
     try:
-        tz_name = tf.timezone_at(lat=lat, lng=lon)
-        if not tz_name:
-            return 3.0
-        local_tz = pytz.timezone(tz_name)
-        localized_dt = local_tz.localize(dt_local, is_dst=None)
-        return localized_dt.utcoffset().total_seconds() / 3600.0
+        if tf is not None:
+            tz_name = tf.timezone_at(lat=lat, lng=lon)
+            if tz_name:
+                local_tz = pytz.timezone(tz_name)
+                localized_dt = local_tz.localize(dt_local, is_dst=None)
+                return localized_dt.utcoffset().total_seconds() / 3600.0
+        return 3.0  # TimezoneFinder olmasa dahi varsayılan Türkiye / UTC+3
     except Exception as e:
         return 3.0
 
@@ -327,7 +333,7 @@ def lahiri_ayanamsa_hesapla(t_skyfield):
     ayanamsa = 23.85 + (0.01396 * years_since_2000)
     return ayanamsa
 
-# GARANTİLİ VE KESİN DİNAMİK HESAPLAMA MOTORU
+# GARANTİLİ HESAPLAMA MOTORU
 def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke="Türkiye", sehir="Ankara"):
     ay_sozluk = {
         "ocak": 1, "şubat": 2, "subat": 2, "mart": 3, "nisan": 4, 
@@ -490,30 +496,30 @@ class SayfaIki(Screen):
 
         # HESAPLA BUTONU
         btn_hesapla = Button(
-            text="HESAPLA", size_hint=(0.55, 0.07), pos_hint={'center_x': 0.5, 'center_y': 0.18},
+            text="HESAPLA", size_hint=(0.55, 0.07), pos_hint={'center_x': 0.5, 'center_y': 0.19},
             background_color=(0.75, 0.22, 0.17, 1), font_size='18sp', bold=True
         )
         btn_hesapla.bind(on_release=self.hesapla)
         layout.add_widget(btn_hesapla)
 
-        # REHBER BUTONU
+        # REHBER & YASAL UYARI BUTONU
         btn_rehber = Button(
-            text="Rehber & Yasal Uyarı", size_hint=(0.45, 0.04), pos_hint={'center_x': 0.5, 'center_y': 0.10},
+            text="Rehber & Yasal Uyarı", size_hint=(0.45, 0.04), pos_hint={'center_x': 0.5, 'center_y': 0.11},
             background_color=(0.91, 0.45, 0.62, 1), font_size='12sp', bold=True
         )
         btn_rehber.bind(on_release=rehber_popup_goster)
         layout.add_widget(btn_rehber)
 
-        # GÖRSELDEKİ SAAT & UYARI METNİ
+        # KARMİK BİLGİLENDİRME VE HASSAS SAAT UYARISI METNİ
         lbl_saat_uyari = Label(
             text='"Doğum saatinizden ve AM/PM (Gece/Gündüz)\nseçiminizden emin olunuz. 1 saatlik bir sapma\nbile Ay konumunu değiştirebilir."',
-            size_hint=(0.85, 0.08),
-            pos_hint={'center_x': 0.5, 'center_y': 0.04},
+            size_hint=(0.88, 0.07),
+            pos_hint={'center_x': 0.5, 'center_y': 0.045},
             color=(0.75, 0.22, 0.17, 1),
-            font_size='11sp',
+            font_size='11.5sp',
+            bold=True,
             halign='center',
-            valign='middle',
-            bold=True
+            valign='middle'
         )
         lbl_saat_uyari.bind(size=lbl_saat_uyari.setter('text_size'))
         layout.add_widget(lbl_saat_uyari)
@@ -656,7 +662,6 @@ class SayfaUc(Screen):
                 nak = metin_sadeleştir(item.get("nakshatra") or item.get("nakshatra1") or item.get("naksatra"))
                 prt = metin_sadeleştir(item.get("partner") or item.get("nakshatra2") or item.get("partner_naksatra"))
 
-                # Aynı Nakşatra seçiminde (Örn: Uttara Bhadra - Uttara Bhadra) tek eşleşmeyi al
                 if target_sen == target_o:
                     if nak == target_sen and prt == target_o:
                         sen_to_o_veri = item
@@ -677,13 +682,10 @@ class SayfaUc(Screen):
             self.lbl_yuzde.text = f"%{yuzde}"
 
             birlesik_metin = ""
-
-            # Eğer iki taraf aynı Nakşatra ise TEK yorum bas (Çizgisiz)
             if target_sen == target_o and sen_to_o_veri:
                 birlesik_metin += f"📌 {sen_nak.title()} gözüyle {o_nak.title()}:\n"
                 birlesik_metin += f"{sen_to_o_veri.get('description') or sen_to_o_veri.get('aciklama') or 'Açıklama bulunamadı.'}"
             else:
-                # İki farklı Nakşatra ise çift taraflı bakış açısı bas
                 if sen_to_o_veri:
                     birlesik_metin += f"📌 {sen_nak.title()} gözüyle {o_nak.title()}:\n"
                     birlesik_metin += f"{sen_to_o_veri.get('description') or sen_to_o_veri.get('aciklama') or 'Açıklama bulunamadı.'}"

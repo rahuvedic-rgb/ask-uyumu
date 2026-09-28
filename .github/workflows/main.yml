@@ -1,4 +1,4 @@
-name: APK Derleme Otomasyonu (Kivy Docker)
+name: APK Derleme Otomasyonu (Buildozer)
 
 on:
   push:
@@ -7,17 +7,16 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Repositori Kodlarını Çek
       uses: actions/checkout@v4
 
-    - name: Buildozer Action ile APK Derle
-      uses: ArtemisS3/action-kivy-buildozer@v1
+    - name: Buildozer Docker ile APK Derle
+      uses: docker://kivy/buildozer
       with:
-        workdir: .
-        buildozer_version: 'stable'
+        args: buildozer -v android debug
 
     - name: Derlenen APK Dosyasını Yükle
       uses: actions/upload-artifact@v4

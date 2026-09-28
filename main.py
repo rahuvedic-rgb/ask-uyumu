@@ -3,17 +3,6 @@ import json
 import math
 from datetime import datetime, timedelta
 
-# Skyfield ve Lisanssız Matematiksel Kütüphaneler
-from skyfield.api import load, Topos
-import pytz
-
-# TimezoneFinder Güvenli Yükleme
-try:
-    from timezonefinder import TimezoneFinder
-    tf = TimezoneFinder()
-except Exception:
-    tf = None
-
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.floatlayout import FloatLayout
@@ -29,6 +18,24 @@ from kivy.utils import platform
 from kivy.network.urlrequest import UrlRequest
 from kivy.clock import Clock
 
+# Güvenli Kütüphane Yüklemeleri (Çökmeyi Önler)
+try:
+    import pytz
+except Exception:
+    pytz = None
+
+try:
+    from timezonefinder import TimezoneFinder
+    tf = TimezoneFinder()
+except Exception:
+    tf = None
+
+try:
+    from skyfield.api import load, Topos
+    ts = load.timescale()
+except Exception:
+    ts = None
+
 if platform not in ('android', 'ios'):
     Window.size = (360, 640)
 
@@ -36,15 +43,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(BASE_DIR, "naksatra_cache.json")
 GITHUB_JSON_URL = "https://raw.githubusercontent.com/rahuvedic-rgb/ask-uyumu/main/sukur_naksatra_uyum_data_3.json"
 
-# Skyfield Ephemeris Verisinin Yüklenmesi
-ts = load.timescale()
+# Ephemeris Verisi Güvenli Kontrol
 eph = None
-try:
-    load_dir = load.directory = BASE_DIR
-    eph = load('de421.bsp')
-    print("[SKYFIELD SUCCESS] de421.bsp başarıyla yüklendi.")
-except Exception as e:
-    print(f"[SKYFIELD HATA] de421.bsp yüklenemedi: {e}")
+if ts is not None:
+    try:
+        load.directory = BASE_DIR
+        eph = load('de421.bsp')
+        print("[SKYFIELD SUCCESS] de421.bsp başarıyla yüklendi.")
+    except Exception as e:
+        print(f"[SKYFIELD HATA] de421.bsp yüklenemedi: {e}")
 
 REHBER_VE_YASAL_UYARI_METNI = """==================================
    AŞK UYUMU ANALİZİ - REHBER
@@ -316,7 +323,7 @@ def metin_sadeleştir(s):
 
 def otomatik_utc_offset_bul(lat, lon, dt_local):
     try:
-        if tf is not None:
+        if tf is not None and pytz is not None:
             tz_name = tf.timezone_at(lat=lat, lng=lon)
             if tz_name:
                 local_tz = pytz.timezone(tz_name)
@@ -326,8 +333,7 @@ def otomatik_utc_offset_bul(lat, lon, dt_local):
     except Exception as e:
         return 3.0
 
-def lahiri_ayanamsa_hesapla(t_skyfield):
-    julian_date = t_skyfield.tt
+def lahiri_ayanamsa_hesapla(julian_date):
     years_since_2000 = (julian_date - 2451545.0) / 365.25
     ayanamsa = 23.85 + (0.01396 * years_since_2000)
     return ayanamsa
@@ -361,27 +367,28 @@ def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke
         tz_offset = otomatik_utc_offset_bul(lat, lon, dt_local)
 
         dt_utc = dt_local - timedelta(hours=tz_offset)
-        t = ts.utc(dt_utc.year, dt_utc.month, dt_utc.day, dt_utc.hour, dt_utc.minute, dt_utc.second)
 
-        global eph
-        if eph is None:
+        tropical_moon_deg = None
+        julian_date = 2451545.0 + (dt_utc - datetime(2000, 1, 1, 12, 0)).total_seconds() / 86400.0
+
+        if ts is not None and eph is not None:
             try:
-                eph = load('de421.bsp')
-            except Exception as e:
-                print(f"[RE-LOAD FAIL] de421.bsp okunamıyor: {e}")
+                t = ts.utc(dt_utc.year, dt_utc.month, dt_utc.day, dt_utc.hour, dt_utc.minute, dt_utc.second)
+                julian_date = t.tt
+                earth = eph['earth']
+                moon = eph['moon']
+                observer = earth + Topos(latitude_degrees=lat, longitude_degrees=lon)
+                astrometric = observer.at(t).observe(moon)
+                ecliptic_lat, ecliptic_lon, distance = astrometric.ecliptic_latlon()
+                tropical_moon_deg = ecliptic_lon.degrees % 360.0
+            except Exception as ex:
+                print(f"[SKYFIELD RUNTIME EXCEPTION] {ex}")
 
-        if eph is not None:
-            earth = eph['earth']
-            moon = eph['moon']
-            observer = earth + Topos(latitude_degrees=lat, longitude_degrees=lon)
-            astrometric = observer.at(t).observe(moon)
-            ecliptic_lat, ecliptic_lon, distance = astrometric.ecliptic_latlon()
-            tropical_moon_deg = ecliptic_lon.degrees % 360.0
-        else:
+        if tropical_moon_deg is None:
             day_of_year = dt_utc.timetuple().tm_yday
             tropical_moon_deg = ((y - 2000) * 365.25 + day_of_year + (dt_utc.hour / 24.0)) * 13.17639 % 360.0
 
-        ayanamsa = lahiri_ayanamsa_hesapla(t)
+        ayanamsa = lahiri_ayanamsa_hesapla(julian_date)
         sidereal_moon_deg = (tropical_moon_deg - ayanamsa) % 360.0
 
         nakshatra_index = int(sidereal_moon_deg / (360.0 / 27.0)) % 27
@@ -434,8 +441,11 @@ class SayfaBir(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
-        bg = Image(source=os.path.join(BASE_DIR, "1uyum (1).jpg"), allow_stretch=True, keep_ratio=False)
-        layout.add_widget(bg)
+        
+        bg_path = os.path.join(BASE_DIR, "1uyum (1).jpg")
+        if os.path.exists(bg_path):
+            bg = Image(source=bg_path, allow_stretch=True, keep_ratio=False)
+            layout.add_widget(bg)
 
         btn_hesapla = Button(
             text="HESAPLA", size_hint=(0.55, 0.07), pos_hint={'center_x': 0.5, 'center_y': 0.18},
@@ -457,8 +467,11 @@ class SayfaIki(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
-        bg = Image(source=os.path.join(BASE_DIR, "1uyum (2).jpg"), allow_stretch=True, keep_ratio=False)
-        layout.add_widget(bg)
+        
+        bg_path = os.path.join(BASE_DIR, "1uyum (2).jpg")
+        if os.path.exists(bg_path):
+            bg = Image(source=bg_path, allow_stretch=True, keep_ratio=False)
+            layout.add_widget(bg)
 
         # SEN BÖLÜMÜ
         self.sen_gun = Spinner(text="01", values=GUNLER, size_hint=(0.18, 0.04), pos_hint={'x': 0.30, 'top': 0.88})
@@ -508,7 +521,7 @@ class SayfaIki(Screen):
         btn_rehber.bind(on_release=rehber_popup_goster)
         layout.add_widget(btn_rehber)
 
-        # GÖRSELDEKİ SAAT & UYARI METNİ
+        # SAAT & UYARI METNİ
         lbl_saat_uyari = Label(
             text='"Doğum saatinizden ve AM/PM (Gece/Gündüz)\nseçiminizden emin olunuz. 1 saatlik bir sapma\nbile Ay konumunu değiştirebilir."',
             size_hint=(0.85, 0.08),
@@ -565,8 +578,11 @@ class SayfaUc(Screen):
         self.son_o_nak = "ANURADHA"
 
         layout = FloatLayout()
-        bg = Image(source=os.path.join(BASE_DIR, "1uyum (3).jpg"), allow_stretch=True, keep_ratio=False)
-        layout.add_widget(bg)
+        
+        bg_path = os.path.join(BASE_DIR, "1uyum (3).jpg")
+        if os.path.exists(bg_path):
+            bg = Image(source=bg_path, allow_stretch=True, keep_ratio=False)
+            layout.add_widget(bg)
 
         # SEN BÖLÜMÜ
         scroll_sen = ScrollView(

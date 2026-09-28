@@ -27,8 +27,8 @@ orientation = portrait
 # (bool) Fullscreen
 fullscreen = 0
 
-# (str) Icon
-icon.filename = %(source.dir)s/1uyum (1).jpg
+# (str) Icon filename (Türkçe karakter ve parantez içermeyen temiz dosya)
+icon.filename = %(source.dir)s/icon.png
 
 # (list) Permissions
 internet = INTERNET, ACCESS_NETWORK_STATE

@@ -314,7 +314,6 @@ def metin_sadeleştir(s):
         s = s.replace(k, v)
     return "".join(c for c in s if c.isalpha())
 
-# GÜVENLİ VE HATA VERMEYEN ZAMAN DİLİMİ MANTIGI
 def otomatik_utc_offset_bul(lat, lon, dt_local):
     try:
         if tf is not None:
@@ -323,7 +322,7 @@ def otomatik_utc_offset_bul(lat, lon, dt_local):
                 local_tz = pytz.timezone(tz_name)
                 localized_dt = local_tz.localize(dt_local, is_dst=None)
                 return localized_dt.utcoffset().total_seconds() / 3600.0
-        return 3.0  # TimezoneFinder olmasa dahi varsayılan Türkiye / UTC+3
+        return 3.0
     except Exception as e:
         return 3.0
 
@@ -333,7 +332,6 @@ def lahiri_ayanamsa_hesapla(t_skyfield):
     ayanamsa = 23.85 + (0.01396 * years_since_2000)
     return ayanamsa
 
-# GARANTİLİ HESAPLAMA MOTORU
 def naksatra_hesapla(gun, ay_str, yil_str, saat_str, dakika_str, am_pm_str, ulke="Türkiye", sehir="Ankara"):
     ay_sozluk = {
         "ocak": 1, "şubat": 2, "subat": 2, "mart": 3, "nisan": 4, 
@@ -496,30 +494,30 @@ class SayfaIki(Screen):
 
         # HESAPLA BUTONU
         btn_hesapla = Button(
-            text="HESAPLA", size_hint=(0.55, 0.07), pos_hint={'center_x': 0.5, 'center_y': 0.19},
+            text="HESAPLA", size_hint=(0.55, 0.07), pos_hint={'center_x': 0.5, 'center_y': 0.18},
             background_color=(0.75, 0.22, 0.17, 1), font_size='18sp', bold=True
         )
         btn_hesapla.bind(on_release=self.hesapla)
         layout.add_widget(btn_hesapla)
 
-        # REHBER & YASAL UYARI BUTONU
+        # REHBER BUTONU
         btn_rehber = Button(
-            text="Rehber & Yasal Uyarı", size_hint=(0.45, 0.04), pos_hint={'center_x': 0.5, 'center_y': 0.11},
+            text="Rehber & Yasal Uyarı", size_hint=(0.45, 0.04), pos_hint={'center_x': 0.5, 'center_y': 0.10},
             background_color=(0.91, 0.45, 0.62, 1), font_size='12sp', bold=True
         )
         btn_rehber.bind(on_release=rehber_popup_goster)
         layout.add_widget(btn_rehber)
 
-        # KARMİK BİLGİLENDİRME VE HASSAS SAAT UYARISI METNİ
+        # GÖRSELDEKİ SAAT & UYARI METNİ
         lbl_saat_uyari = Label(
             text='"Doğum saatinizden ve AM/PM (Gece/Gündüz)\nseçiminizden emin olunuz. 1 saatlik bir sapma\nbile Ay konumunu değiştirebilir."',
-            size_hint=(0.88, 0.07),
-            pos_hint={'center_x': 0.5, 'center_y': 0.045},
+            size_hint=(0.85, 0.08),
+            pos_hint={'center_x': 0.5, 'center_y': 0.04},
             color=(0.75, 0.22, 0.17, 1),
-            font_size='11.5sp',
-            bold=True,
+            font_size='11sp',
             halign='center',
-            valign='middle'
+            valign='middle',
+            bold=True
         )
         lbl_saat_uyari.bind(size=lbl_saat_uyari.setter('text_size'))
         layout.add_widget(lbl_saat_uyari)
@@ -682,6 +680,7 @@ class SayfaUc(Screen):
             self.lbl_yuzde.text = f"%{yuzde}"
 
             birlesik_metin = ""
+
             if target_sen == target_o and sen_to_o_veri:
                 birlesik_metin += f"📌 {sen_nak.title()} gözüyle {o_nak.title()}:\n"
                 birlesik_metin += f"{sen_to_o_veri.get('description') or sen_to_o_veri.get('aciklama') or 'Açıklama bulunamadı.'}"

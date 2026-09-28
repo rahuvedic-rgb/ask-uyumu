@@ -1,6 +1,6 @@
 [app]
 
-# (str) Application title
+# (str) Title of your application
 title = AskUyumu
 
 # (str) Package name
@@ -19,8 +19,8 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-# Skyfield ve temel bağımlılıkları kararlı sürümleriyle eklendi
-requirements = python3,kivy==2.2.1,skyfield,sgp4,jplephem,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
+# Sadece Kivy ve saf Python kütüphaneleri tutuldu
+requirements = python3,kivy==2.2.1,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
 orientation = portrait

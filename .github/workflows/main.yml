@@ -1,4 +1,4 @@
-name: APK Derleme Otomasyonu (Buildozer)
+name: APK Derleme Otomasyonu (Kivy Docker)
 
 on:
   push:
@@ -7,36 +7,19 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Repositori Kodlarını Çek
       uses: actions/checkout@v4
 
-    - name: Python Ortamını Kur
-      uses: actions/setup-python@v5
+    - name: Buildozer Action ile APK Derle
+      uses: ArtemisS3/action-kivy-buildozer@v1
       with:
-        python-version: '3.10'
+        workdir: .
+        buildozer_version: 'stable'
 
-    - name: Sistem Bağımlılıklarını Kur
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libssl-dev libffi-dev \
-          python3-dev python3-pip git zip unzip openjdk-17-jdk \
-          autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
-          libncursesw5-dev libtinfo5 cmake
-
-    - name: Kararlı Derleme Araçlarını Yükle
-      run: |
-        pip install --upgrade pip
-        pip install "cython<3.0.0" cffi buildozer==1.5.0
-
-    - name: Eski Python 3.14 Önbelleğini Temizle ve APK Derle
-      run: |
-        rm -rf ~/.buildozer
-        buildozer -v android debug
-
-    - name: Derlenen APK Dosyasını Yükle (v4)
+    - name: Derlenen APK Dosyasını Yükle
       uses: actions/upload-artifact@v4
       with:
         name: AskUyumu-Debug-APK

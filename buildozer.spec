@@ -19,8 +19,8 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-# Sadece Android ile %100 uyumlu saf paketler
-requirements = python3,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna
+# Sürüm kısıtlamaları kaldırıldı, C-çakışmaları engellendi
+requirements = python3,kivy,pytz,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
 orientation = portrait
@@ -46,6 +46,9 @@ android.accept_sdk_license = True
 
 # (list) Architectures
 android.archs = arm64-v8a
+
+# (str) python-for-android branch
+p4a.branch = master
 
 [buildozer]
 log_level = 2

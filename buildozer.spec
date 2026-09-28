@@ -19,8 +19,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-# Python sürümü kararlı 3.11'e kilitlendi
-requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna
+requirements = python3,kivy,pytz,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
 orientation = portrait
@@ -37,9 +36,6 @@ internet = INTERNET, ACCESS_NETWORK_STATE
 # (int) Minimum & Target Android API
 android.minapi = 21
 android.api = 33
-
-# (str) Android NDK version
-android.ndk = 25b
 
 # (bool) Accept SDK license automatically
 android.accept_sdk_license = True

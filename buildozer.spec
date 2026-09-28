@@ -37,10 +37,13 @@ internet = INTERNET, ACCESS_NETWORK_STATE
 android.minapi = 21
 android.api = 33
 
+# (str) Android NDK version (Kivy uyumluluğu için r25b şarttır)
+android.ndk = 25b
+
 # (bool) Accept SDK license automatically
 android.accept_sdk_license = True
 
-# (list) Architectures (Tek mimari - Çakışmaları önler)
+# (list) Architectures
 android.archs = arm64-v8a
 
 [buildozer]

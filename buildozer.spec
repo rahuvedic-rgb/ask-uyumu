@@ -19,7 +19,6 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-# Sadece Kivy ve saf Python kütüphaneleri tutuldu
 requirements = python3,kivy==2.2.1,pytz,timezonefinder,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
@@ -37,12 +36,11 @@ internet = INTERNET, ACCESS_NETWORK_STATE
 # (int) Minimum & Target Android API
 android.minapi = 21
 android.api = 33
-android.ndk = 25b
 
 # (bool) Accept SDK license automatically
 android.accept_sdk_license = True
 
-# (list) Architectures
+# (list) Architectures (Tek mimari - Çakışmaları önler)
 android.archs = arm64-v8a
 
 [buildozer]

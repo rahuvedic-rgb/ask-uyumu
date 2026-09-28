@@ -31,9 +31,9 @@ jobs:
         pip install --upgrade pip
         pip install "cython<3.0.0" cffi buildozer
 
-    - name: Önbelleği Temizle ve APK Derle
+    - name: Eski Önbelleği Temizle ve APK Derle
       run: |
-        buildozer android clean || true
+        rm -rf ~/.buildozer/android/platform/android-ndk-*
         buildozer -v android debug
 
     - name: Derlenen APK Dosyasını Yükle (v4)

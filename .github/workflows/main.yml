@@ -17,7 +17,7 @@ jobs:
       uses: docker://kivy/buildozer
       with:
         entrypoint: /bin/bash
-        args: -c "buildozer -v android debug"
+        args: -c "BUILDOZER_WARN_ON_ROOT=0 buildozer -v android debug"
 
     - name: Derlenen APK Dosyasını Yükle
       uses: actions/upload-artifact@v4

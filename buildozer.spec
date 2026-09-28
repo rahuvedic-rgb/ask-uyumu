@@ -19,7 +19,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-requirements = python3,kivy,pytz,certifi,urllib3,requests,chardet,idna
+requirements = python3,kivy,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
 orientation = portrait
@@ -27,7 +27,7 @@ orientation = portrait
 # (bool) Fullscreen
 fullscreen = 0
 
-# (str) Icon filename (Türkçe karakter ve parantez içermeyen temiz dosya)
+# (str) Icon filename (Görselinizin tam adı)
 icon.filename = %(source.dir)s/icon.png
 
 # (list) Permissions

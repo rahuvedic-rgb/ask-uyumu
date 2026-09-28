@@ -19,8 +19,8 @@ source.include_exts = py,png,jpg,kv,atlas,json,bsp
 version = 1.0.0
 
 # (list) Application requirements
-# Sürüm kısıtlamaları kaldırıldı, C-çakışmaları engellendi
-requirements = python3,kivy,pytz,certifi,urllib3,requests,chardet,idna
+# Python sürümü kararlı 3.11'e kilitlendi
+requirements = python3==3.11.0,kivy==2.2.1,pytz,certifi,urllib3,requests,chardet,idna
 
 # (str) Supported orientation
 orientation = portrait
@@ -46,9 +46,6 @@ android.accept_sdk_license = True
 
 # (list) Architectures
 android.archs = arm64-v8a
-
-# (str) python-for-android branch
-p4a.branch = master
 
 [buildozer]
 log_level = 2

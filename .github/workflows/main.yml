@@ -26,16 +26,17 @@ jobs:
           autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
           libncursesw5-dev libtinfo5 cmake
 
-    - name: Buildozer Kur
+    - name: Buildozer ve Cython Yükle
       run: |
         pip install --upgrade pip
-        pip install "cython<3.0.0" buildozer
+        pip install "cython<3.0.0" cffi buildozer
 
-    - name: APK Dosyasını Derle
+    - name: Önbelleği Temizle ve APK Derle
       run: |
+        buildozer android clean || true
         buildozer -v android debug
 
-    - name: Derlenen APK Dosyasını Yükle
+    - name: Derlenen APK Dosyasını Yükle (v4)
       uses: actions/upload-artifact@v4
       with:
         name: AskUyumu-Debug-APK
